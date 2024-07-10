@@ -49,7 +49,7 @@ class Font():
         letters = list(text)
         return sum(list(map(lambda letter: self.characters[letter].get_width() + self.spacing if letter != " " else self.space_width + self.spacing, letters))) - self.spacing
 
-    def render(self, screen, text, col, loc):
+    def render(self, screen, text, col, loc, alpha=255):
         x_offset = 0
         y_offset = 0
         for char in text:
@@ -62,7 +62,7 @@ class Font():
                 x_offset = 0
             else:
                 #gets the character, returning a '?' if not found
-                letter = self.characters.get(char, self.characters['?']).copy()
+                letter: pygame.Surface = self.characters.get(char, self.characters['?']).copy()
 
                 #change colour of the character using masks (somewhat laggy, load once and use multiple times)
                 pixel_array = pygame.surfarray.array3d(letter)
@@ -70,6 +70,7 @@ class Font():
                 pixel_array[mask] = col
                 pygame.surfarray.blit_array(letter, pixel_array)
                 letter.set_colorkey((0, 0, 0))
+                letter.set_alpha(alpha)
 
                 screen.blit(letter, (loc[0] + x_offset, loc[1] + y_offset))
                 x_offset += letter.get_width() + self.spacing

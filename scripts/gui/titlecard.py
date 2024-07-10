@@ -7,7 +7,7 @@ import os
 import colorsys
 import math
 
-from scripts.utils.CORE_FUNCS import vec
+from scripts.utils.CORE_FUNCS import vec, apply_rainbow
 from scripts.config.SETTINGS import WIDTH
 
     ##############################################################################################
@@ -53,6 +53,8 @@ class Titlecard(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(centerx=WIDTH/2, y=60)
         self.colour = (255, 0, 0)
         self.shadow_colour = (255, 0, 0)
+        self.animation_period = 2000
+        self.elapsed_time = 0
         self.t = 0
 
         self.exit_flag = False
@@ -62,16 +64,28 @@ class Titlecard(pygame.sprite.Sprite):
         self.rect.topleft = vec(self.rect.topleft).lerp(self.end_pos, 0.025)
 
     def animate(self):
-        self.t += 1
-        self.image = swap_color(self.image, self.colour, (c := get_rainbow_color(self.t, 1000)))
-        self.colour = c
-        self.shadow = swap_color(self.shadow, self.shadow_colour, (d := get_rainbow_color(self.t, 1000, offset=-100)))
-        self.shadow_colour = d
+        self.t += self.game.dt * 100
+        self.elapsed_time += self.game.dt * 1000
+        # self.image = swap_color(self.image, self.colour, (c := get_rainbow_color(self.t, 1000)))
+        # self.colour = c
+        # self.shadow = swap_color(self.shadow, self.shadow_colour, (d := get_rainbow_color(self.t, 1000, offset=-100)))
+        # self.shadow_colour = d
 
     def update(self):
         self.animate()
         self.draw()
 
     def draw(self):
-        self.screen.blit(self.shadow, self.rect.topleft + vec(2.2, 2.2 + 5 * math.sin(0.5 * math.radians(self.t))))
-        self.screen.blit(self.image, self.rect.topleft + vec(0, 5 * math.sin(0.5 * math.radians(self.t))))
+        image = apply_rainbow(
+            self.image,
+            offset=(self.animation_period - self.elapsed_time) / self.animation_period,
+            bands=1.2, strength=0.5
+        )
+        shadow = apply_rainbow(
+            self.shadow,
+            offset=(self.animation_period - self.elapsed_time) / self.animation_period,
+            bands=1.2, strength=0.8,
+            colour_offset=(-20, -20, -20)
+        )
+        self.screen.blit(shadow, self.rect.topleft + vec(1.2, 1.2 + 5 * math.sin(0.5 * math.radians(self.t))))
+        self.screen.blit(image, self.rect.topleft + vec(0, 5 * math.sin(0.5 * math.radians(self.t))))

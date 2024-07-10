@@ -62,7 +62,7 @@ def crop(spritesheet, x, y, width, height, scale=1) -> pygame.Surface:
     cropped.blit(spritesheet, (0, 0), (x, y, width, height))
     return cropped
 
-def apply_rainbow(surface: pygame.Surface, offset=0., strength=0.666, bands=2.) -> pygame.Surface:
+def apply_rainbow(surface: pygame.Surface, offset=0., strength=0.666, bands=2., colour_offset=(0, 0, 0)) -> pygame.Surface:
     """Adds a rainbow effect to an image.
 
         Note that this returns a new surface and does not modify the original.

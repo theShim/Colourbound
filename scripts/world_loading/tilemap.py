@@ -150,8 +150,11 @@ class Tilemap:
     async def colour_calculator(self):
         if self.changed:
             arr = pygame.surfarray.array3d(self.grey_map)
-            clear = np.all(arr == [0, 0, 0], axis=-1)
-            self.filled = np.sum(clear)
+            # clear = np.all(arr == [0, 0, 0], axis=-1)
+            # clear = np.all(arr == 0, axis=-1)
+            clear = np.logical_and.reduce(arr == 0, axis=-1)
+            # self.filled = np.sum(clear)
+            self.filled = np.count_nonzero(clear)
             self.changed = False
 
     ##############################################################################################

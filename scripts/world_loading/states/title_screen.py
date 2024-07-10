@@ -7,6 +7,7 @@ import random, math
 
 from scripts.entities.spaceship import Spaceship
 from scripts.gui.titlecard import Titlecard
+from scripts.gui.custom_fonts import Custom_Font
 from scripts.particles.star import Star_3D
 from scripts.world_loading.state_machine import State
 
@@ -28,6 +29,8 @@ class Title_Screen(State):
         self.spaceship = Spaceship(self.game, [])
 
         self.titlecard = Titlecard(self.game)
+        self.font = Custom_Font.Fluffy
+        self.alpha = 0
 
         self.black = pygame.Surface((WIDTH, HEIGHT))
         self.black.fill((0, 0, 0))
@@ -38,9 +41,15 @@ class Title_Screen(State):
         self.screen.blit(self.bg, (0, 0))
         
         self.stars.update()
-        self.game.debugger.add_text(f"{(180 / math.pi) * (Star_3D.angle)}")
+        # self.game.debugger.add_text(f"{(180 / math.pi) * (Star_3D.angle)}")
 
         self.spaceship.update()
+
+        if self.titlecard.exit_flag == False:
+            self.alpha += math.radians(1)
+            txt = "Press SPACE to Start"
+            self.font.render(self.screen, txt, (50, 50, 50), ((2 + WIDTH-self.font.calc_surf_width(txt))/2, 2 + 30 + HEIGHT/2 - self.font.space_height/2), alpha=155 * math.sin(self.alpha) + 100)
+            self.font.render(self.screen, txt, (200, 200, 200), ((WIDTH-self.font.calc_surf_width(txt))/2, 30 + HEIGHT/2 - self.font.space_height/2), alpha=155 * math.sin(self.alpha) + 100)
 
         if pygame.key.get_pressed()[pygame.K_SPACE]:
             self.titlecard.exit_flag = True

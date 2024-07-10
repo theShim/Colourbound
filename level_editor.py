@@ -73,7 +73,7 @@ class Editor:
     def __init__(self):
         self.initialise()
 
-        self.offset = vec()
+        self.offset = vec(-25, 25)
         self.scroll_speed = 5
         self.clock = pygame.time.Clock()
 
@@ -136,7 +136,7 @@ class Editor:
 
     def initialise(self):
         pygame.init()  #general pygame
-        pygame.display.set_caption("Super Schizo Man - LEVEL EDITOR")
+        pygame.display.set_caption("Colourbound - LEVEL EDITOR")
 
         pygame.font.init() #font stuff
         self.font = pygame.font.SysFont('Verdana', 10)
@@ -550,6 +550,7 @@ class Editor:
                     "CTRL + O: Load File",
                     "CTRL + S: Save File",
                     "CTRL + T: Auto Tile",
+                    "TAB: Open Tilesets",
                     "<> : Change Layer",
                     "G: Toggle Grid",
                     "WASD: Move",

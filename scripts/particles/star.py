@@ -26,10 +26,14 @@ class Star_3D(pygame.sprite.Sprite):
         else:
             angle = 2
 
-        # if pygame.key.get_pressed()[pygame.K_UP]:
         cls.angle += math.radians(angle)
-        # if pygame.key.get_pressed()[pygame.K_DOWN]:
-        #     cls.angle -= math.radians(angle)
+
+    @classmethod
+    def 
+    ADD ACTUAL STAR SPRITES
+    ADD MENU GUI BUTTONS OF CREDITS, SETTINGS AND MUSIC
+    WORK ON ACC GAMEPLAY
+    ADD MUSIC
 
     def __init__(self, game, groups, screen=None):
         super().__init__(groups)
