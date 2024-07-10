@@ -17,6 +17,7 @@ from scripts.gui.custom_fonts import Custom_Font
 from scripts.gui.dialogue_box import Press_Spacebar
 from scripts.particles.colour_void_shockwave import Shockwave_Particle
 from scripts.particles.paint_splatter import Paint_Splat
+from scripts.particles.star import Star_3D
 from scripts.screen_effects.effect_manager import Effect_Manager
 from scripts.world_loading.state_machine import State_Loader
 from scripts.world_loading.tilemap import Tile
@@ -78,6 +79,7 @@ class Game:
         Custom_Font.init()
         Shockwave_Particle.cache_sprites()
         Press_Spacebar.cache_sprites()
+        Star_3D.cache_sprites()
 
     def initialise(self):
         pygame.init()  #general pygame

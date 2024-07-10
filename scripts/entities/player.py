@@ -212,6 +212,7 @@ class Player(pygame.sprite.Sprite):
         dy = mousePos[1] - (self.rect.centery - self.game.offset.y)
         angle = math.atan2(dy, dx)
         
+        #the lil arrow indicator. annoyed there isnt a better way to do differentiate if its infront of behind
         if self.pointer_first:
             pos = -self.game.offset + vec(self.rect.midbottom) + vec(0, -20) + vec(math.cos(angle), math.sin(angle)) * (self.image.get_width() / 1.5)
             points = [
@@ -225,7 +226,7 @@ class Player(pygame.sprite.Sprite):
             pygame.draw.polygon(self.screen, (0, 0, 0), shadow_points)
             pygame.draw.polygon(self.screen, (100, 100, 100), points)
 
-
+        #the shadow and player itself
         self.screen.blit(shadow, shadow.get_rect(center=(self.rect.midbottom - self.game.offset)))
         self.screen.blit(self.image, self.image.get_rect(midbottom=self.rect.midbottom - self.game.offset - vec(0, self.jump_height)))
         
