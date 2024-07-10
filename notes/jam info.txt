@@ -1,0 +1,72 @@
+Bask in the warmth of creativity and let your imagination sizzle! The Pygame Community Game Jam returns this summer, 
+bringing a heatwave of innovation and fun. Dive into the sunny side of game development, creating vibrant games that 
+capture the essence of summer. Whether it's beachside adventures or cool evening escapades, your coding prowess and 
+artistic flair are about to bring the hottest games to life!
+
+
+Deadline: July 14th 2024 at 1:00 AM
+
+Theme: TBD (PROBABLY "INFECTION")
+
+
+Rating Criteria
+
+Theme Integrity:
+How well does the game capture the spirit of the jam's theme? Higher scores go to games that creatively 
+interpret the theme or use it in unexpected ways.
+
+Artistry:
+Does the game's audio and visuals create a compelling atmosphere or experience? This category considers 
+the overall quality and effectiveness of the sound effects, music, and visuals, not necessarily technical perfection.
+
+Innovation:
+How fresh and unique are the game's core mechanics and ideas? This doesn't necessarily mean complex mechanics; 
+even simple ideas can be innovative in their execution.
+
+Polish:
+How much attention to detail has been given to enhance the overall experience? This includes aspects like:
+Programming details (physics, visual effects)
+
+Graphic detail
+Level design (count, size, detail)
+User interface clarity
+Presence of easter eggs
+Games with bugs or rushed sections will receive lower scores in this category.
+
+Engagement:
+How well does the game hold your attention and make you want to keep playing? This considers factors like:
+Fun factor and overall gameplay experience
+Clear goals and mechanics
+Difficulty curve that's both challenging and rewarding
+Replayability or the desire to keep coming back for more
+
+
+Rules
+All submissions must be created between the start and end of the jam. 
+Games that were started before the start of the jam will not be allowed. 
+Post-jam versions of your game must be clearly marked as such.
+Pre-existing engine/utility code can be reused for this jam. 
+However, code specific for this jam must be created after the jam starts.
+Pygame(-ce) must be the primary tool used for rendering and sound. 
+Using things such as, e.g. modernGL for shaders or pyaudio for sound manipulation is allowed, 
+but pygame must be used for the bulk of the work. This helps to keep things even between participants. 
+(If possible, the pygame-ce fork of pygame should be used)
+You MUST create all assets used in your entry during the jam. 
+Asset generators are perfectly fine to use, but NO premade assets are allowed, even if you have the rights to them. 
+
+This includes creative commons works (even CC0). Exceptions:
+Things in the public domain that are over ~70 years old (e.g. classical music pieces, old paintings, etc) 
+Fonts (which you must of course still have license to use).
+Premade splash screens or logos
+Pygame assets from https://pyga.me/docs/logos.html exclusively.
+Every jam we have a bunch of entries that ignore this rule please don't ignore this rule.
+
+Please be careful with delicate or controversial subject matter. Do not make games with NSFW/18+ content. 
+Teams of 2+ are allowed for this jam. However no more than 2 Discord Nitro awards will be awarded per team.
+Upon submitting your game you will be required to leave a link to your game's source code as well as the Discord #'s of all team members.
+You are not allowed to have fun throughout the creation process. Any team caught enjoying the jam will be disqualified. /s
+
+Prizes
+1st Place - 2 Months Discord Nitro
+2nd Place - 1 Month Discord Nitro
+3rd Place - 1 Month Discord Nitro Basic (Note that for those working in teams, only a maximum of 2 Nitros will be given out for a given entry)
