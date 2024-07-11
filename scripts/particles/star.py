@@ -61,7 +61,7 @@ class Star_3D(pygame.sprite.Sprite):
         self.mask: pygame.Mask = random.choice(self.MASKS).copy()
         self.rot = random.uniform(0, 360)
         self.sprite = pygame.transform.rotate(self.mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=self.colour), self.rot)
-        self.grey_sprite = pygame.transform.rotate(self.mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=self.grey_colour), self.rot)
+        self.grey_sprite = pygame.transform.grayscale(self.sprite)
 
         self.last_sprite = self.sprite.copy()
         self.last_size = 0
@@ -69,6 +69,7 @@ class Star_3D(pygame.sprite.Sprite):
     def grey_switch(self):
         self.grey = True
         self.colour = self.grey_colour
+        self.last_size = 0
 
     def get_pos_3d(self, scale=1):
         x = random.uniform(-WIDTH, WIDTH) * 4
@@ -100,7 +101,7 @@ class Star_3D(pygame.sprite.Sprite):
         self.size = max(1, (Star_3D.Z_DISTANCE / (((self.pos_3d.z * self.radius) ** 1.3))))
 
         if not 641 <= self.pos_3d.x <= 642:
-            if 100 > self.size > 1:
+            if 100 > self.size:
                 self.draw()
             else:
                 self.draw(pixel=True)
@@ -112,19 +113,15 @@ class Star_3D(pygame.sprite.Sprite):
             if r != self.last_size:
                 self.last_size = r
                 sprite = self.sprite
-                if self.grey: sprite = self.grey_sprite
+                if self.grey: 
+                    sprite = self.grey_sprite
                 surf = pygame.transform.scale(sprite, vec(sprite.get_size()) * r)
                 self.last_sprite = surf
             else:
                 surf = self.last_sprite
             self.screen.blit(surf, surf.get_rect(center=self.project()))
             
-            # r *= 30
-            # surf = pygame.Surface((r*2, r*2), pygame.SRCALPHA)
-            # pygame.draw.circle(surf, (5, 5, 5), (r, r), r)
-            # surf.set_alpha(128*math.sin(self.alpha) ** 2)
-            # # pygame.draw.circle(surf, (self.colour.r, self.colour.g, self.colour.b, 128 * math.sin(self.alpha) ** 2 + 127), (r, r), r)
-            # self.screen.blit(surf, surf.get_rect(center=self.project()), special_flags=pygame.BLEND_RGBA_ADD)
+            # r *= 30rf, surf.get_rect(center=self.project()), special_flags=pygame.BLEND_RGBA_ADD)
 
         else:
             self.screen.set_at(self.project(), (

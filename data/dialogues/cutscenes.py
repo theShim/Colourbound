@@ -21,8 +21,8 @@ you. \t\tUnless something really bad happens.
 """,
     4 : """
 What the hell just happened?
-It's like the colour of well, everything is
-just gone.
+It's like the colour of well, 
+everything is just gone.
 """,
     5 : """
 Hold on... don't you run on colour?

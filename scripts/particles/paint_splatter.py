@@ -51,6 +51,8 @@ class Paint_Splatter(pygame.sprite.Sprite):
     ##############################################################################################
 
 class Paint_Splat(pygame.sprite.Sprite):
+
+    SPLAT_COOLDOWN = 5
     
     @classmethod
     def cache_sprites(cls):
@@ -82,3 +84,21 @@ class Paint_Splat(pygame.sprite.Sprite):
         self.pos = pos
         self.rect = self.image.get_rect(center=self.pos)
         self.game.state_loader.tilemap.changed = True
+
+        # if self.game.music_player.is_playing("sfx") and self.game.music_player.is_playing("splat"):
+        #     if self.SPLAT_COOLDOWN > 0
+
+        # if self.SPLAT_COOLDOWN > 0:
+        #     self.SPLAT_COOLDOWN -= 1
+        # else:
+        #     self.SPLAT_COOLDOWN = 5
+
+        self.kill()
+            
+        splat = f"paint_splat_{random.randint(1,3)}"
+        if not self.game.music_player.is_playing("sfx"):
+            self.game.music_player.play(splat, "sfx")
+            self.game.music_player.set_vol(random.uniform(0.1, 0.5), "sfx")
+        elif not self.game.music_player.is_playing("splat"):
+            self.game.music_player.play(splat, "splat")
+            self.game.music_player.set_vol(random.uniform(0.1, 0.5), "splat")

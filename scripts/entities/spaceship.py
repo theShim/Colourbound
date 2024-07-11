@@ -223,10 +223,10 @@ class Spaceship_Fidget_Spinner(pygame.sprite.Sprite):
         self.sprites = Spaceship_Fidget_Spinner.SPRITES
         self.status = "idle"
         self.z = Z_LAYERS["player"]
-        self.rect = self.image.get_rect(center=(248, -58))
+        self.rect = self.image.get_rect(center=(208, -58))
 
         self.angle = math.atan2(1.75, 1)
-        self.speed = 2
+        self.speed = 2.4
         self.rot = 0
         self.rot_speed = 12
 

@@ -43,7 +43,7 @@ class Dialogue_Box(pygame.sprite.Sprite):
         self.finished = False
 
         # self.typing_sounds_flag = typing_sounds_flag
-        # self.clack = False      #typing sound
+        self.type_clack_cooldown = 2
 
         self.name = person_name if person_name.lower() != "ship_grey" else "Ship"
         self.background = pygame.image.load(f"assets/gui/dialogue_{person_name.lower()}.png").convert_alpha()
@@ -93,6 +93,11 @@ class Dialogue_Box(pygame.sprite.Sprite):
                     self.delay_timer.reset()
                 else:
                     self.finished = True
+
+    def typing_click(self):
+        if abs(self.t - self.prev) >= self.type_clack_cooldown:
+            self.prev = self.t
+            self.game.music_player.play("typing", "typing")
             
         ###################################################################################### 
 
@@ -110,11 +115,7 @@ class Dialogue_Box(pygame.sprite.Sprite):
             if not self.other_delay_timer.finished:
                 return
         
-        # put into another method
-        # self.clack = False
-        # if abs(self.t - self.prev) >= 1:
-        #     self.prev = self.t
-        #     self.clack = True
+        self.typing_click()
 
         if self.t < len(self.text):
             self.t += self.speed

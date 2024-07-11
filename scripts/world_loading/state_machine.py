@@ -4,6 +4,7 @@ with contextlib.redirect_stdout(None):
     from pygame.locals import *
 
 from scripts.world_loading.tilemap import Tilemap
+from scripts.world_loading.backgrounds import Starry_Background
 from scripts.gui.colour_fill_meter import Colour_Meter
 
     ##############################################################################################
@@ -75,10 +76,12 @@ class State:
         self.prev = prev
         self.tilemap = Tilemap(self.game)
         
+        self.background = Starry_Background(self.game)
         self.colour_meter = Colour_Meter(self.game, [self.game.all_sprites])
 
     def update(self):
-        self.screen.fill((0, 0, 0))
+        # self.screen.fill((0, 0, 0))
+        self.background.update()
         self.game.calculate_offset()
         self.render()
 

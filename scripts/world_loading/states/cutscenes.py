@@ -106,13 +106,20 @@ class Cutscene_1(Cutscene):
         self.game.offset = vec()
         self.stage = 0
 
+        self.bg_music = "into_space"
+
     def update(self):
+
         self.window.blit(self.bg, (0, 0))
         self.stars.update()
         self.screen.blit(self.window, (0, 0))
         self.spaceship.update()
 
         if self.stage == 0:
+            if not self.game.music_player.is_playing("bg"):
+                self.game.music_player.set_vol(vol=1, channel="bg")
+                self.game.music_player.play(self.bg_music, "bg", loop=True, fade_in=1000)
+
             if self.black_alpha > 0:
                 self.black_alpha -= 5
                 self.black.set_alpha(self.black_alpha)
@@ -140,6 +147,7 @@ class Cutscene_1(Cutscene):
             if self.dialogues[self.dialogue_counter].finished:
                 self.stage = 4
                 self.dialogue_counter += 1
+                self.game.music_player.stop("bg", fadeout_ms=0)
 
         elif self.stage == 4:
             self.colourvoid_radius += 5
@@ -245,8 +253,13 @@ class Cutscene_2(Cutscene):
 
         self.game.offset = vec()
         self.stage = 0
+        self.start = -10
 
     def update(self):
+        if not self.game.music_player.is_playing("sfx"):
+            self.game.music_player.set_vol(vol=0.5, channel="sfx")
+            self.game.music_player.play("falling_in_space", "sfx", fade_in=2000)
+
         self.window.blit(self.bg, (0, 0))
         self.stars.update()
         # for effect in self.after_effects:
@@ -267,9 +280,9 @@ class Cutscene_2(Cutscene):
                 self.stage = 2
 
         elif self.stage == 2:
-            if self.black_alpha > 0:
-                self.black_alpha -= 20
-                self.black.set_alpha(self.black_alpha)
+            if self.black_alpha < 505:
+                self.black_alpha += 10
+                self.black.set_alpha(min(255, self.black_alpha))
                 self.screen.blit(self.black, (0, 0))
             else:
                 self.game.state_loader.add_state(self.game.state_loader.states["planet_1"])

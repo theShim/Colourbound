@@ -37,7 +37,14 @@ class Title_Screen(State):
         self.black_alpha = 0
         self.black.set_alpha(self.black_alpha)
 
+        self.bg_music = "title_screen"
+        self.start = True
+
     def update(self):
+        if self.start:
+            self.start = False
+            self.game.music_player.play(self.bg_music, "bg", loop=True)
+
         self.screen.blit(self.bg, (0, 0))
         
         self.stars.update()
@@ -51,13 +58,20 @@ class Title_Screen(State):
             self.font.render(self.screen, txt, (50, 50, 50), ((2 + WIDTH-self.font.calc_surf_width(txt))/2, 2 + 30 + HEIGHT/2 - self.font.space_height/2), alpha=155 * math.sin(self.alpha) + 100)
             self.font.render(self.screen, txt, (200, 200, 200), ((WIDTH-self.font.calc_surf_width(txt))/2, 30 + HEIGHT/2 - self.font.space_height/2), alpha=155 * math.sin(self.alpha) + 100)
 
-        if pygame.key.get_pressed()[pygame.K_SPACE]:
-            self.titlecard.exit_flag = True
-            self.spaceship.stage = 1
+        if self.spaceship.stage == 0:
+            if pygame.key.get_pressed()[pygame.K_SPACE]:
+                self.titlecard.exit_flag = True
+                self.spaceship.stage = 1
         if self.titlecard.exit_flag:
             self.titlecard.exit()
             self.spaceship.mouse_control = False
         if self.spaceship.stage == 2:      
+            if not self.game.music_player.is_playing("sfx"):
+                self.game.music_player.play("warp_speed", "sfx")
+                self.game.music_player.set_vol(vol=0.5, channel="sfx")
+
+            self.game.music_player.set_vol((400 - ((180/math.pi) * Star_3D.angle)) / 400, channel="bg")
+
             Star_3D.update_angle()
         self.titlecard.update()
 
@@ -65,6 +79,7 @@ class Title_Screen(State):
             self.black_alpha += 5
             self.black.set_alpha(self.black_alpha)
             self.screen.blit(self.black, (0, 0))
+            self.game.music_player.stop("bg")
 
         if (180/math.pi) * Star_3D.angle > 1100:
             self.game.state_loader.add_state(self.game.state_loader.states["cutscene_1"])
