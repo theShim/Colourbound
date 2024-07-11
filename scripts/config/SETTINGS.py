@@ -9,6 +9,7 @@ FPS = 60
 CAMERA_FOLLOW_SPEED = 12
 TILE_SIZE = 32
 
+#blitting order of sprites, tilemap goes before this
 Z_LAYERS = {
     "background particle" : 3,
     "player" : 5,

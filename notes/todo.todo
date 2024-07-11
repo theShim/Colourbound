@@ -2,7 +2,4 @@
 - make map
 - change the colour of every tile sprite
 - fix sprites of going from down_right -> right, it turns too sharply
-- paint splat
-- paint bullet/blob texture
-- splash effect (metaballs, joining circles by lines to create density)
 Archive:

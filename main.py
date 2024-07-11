@@ -65,7 +65,7 @@ class Game:
         self.particles = pygame.sprite.Group()
 
         #the finite state machine responsible for the current scene in game.
-        self.state_loader = State_Loader(self, "planet_1")
+        self.state_loader = State_Loader(self, "title_screen")
         self.state_loader.populate_states() #initialising all the states
 
         #vfx and sfx stuff

@@ -16,6 +16,7 @@ class Sound(pygame.mixer.Sound):
         super().__init__(filename)
         self.name = filename.split("/")[-1]
 
+#stores all the music
 SOUNDS = {
     "title_screen" : Sound("music/title_screen.wav"),
     "into_space" : Sound("music/into_space.wav"),

@@ -8,6 +8,8 @@ import random, math
 from scripts.entities.spaceship import Spaceship
 from scripts.gui.titlecard import Titlecard
 from scripts.gui.custom_fonts import Custom_Font
+from scripts.gui.menu_buttons import Settings_Button, Sound_Button, Music_Button
+
 from scripts.particles.star import Star_3D
 from scripts.world_loading.state_machine import State
 
@@ -37,6 +39,11 @@ class Title_Screen(State):
         self.black_alpha = 0
         self.black.set_alpha(self.black_alpha)
 
+        self.menu_buttons = pygame.sprite.Group()
+        Settings_Button(self.game, [self.menu_buttons])
+        Sound_Button(self.game, [self.menu_buttons])
+        Music_Button(self.game, [self.menu_buttons])
+
         self.bg_music = "title_screen"
         self.start = True
 
@@ -51,6 +58,8 @@ class Title_Screen(State):
         # self.game.debugger.add_text(f"{(180 / math.pi) * (Star_3D.angle)}")
 
         self.spaceship.update()
+
+        self.menu_buttons.update()
 
         if self.titlecard.exit_flag == False:
             self.alpha += math.radians(1)

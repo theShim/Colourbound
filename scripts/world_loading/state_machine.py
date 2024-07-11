@@ -9,14 +9,22 @@ from scripts.gui.colour_fill_meter import Colour_Meter
 
     ##############################################################################################
 
+#state handler / finite state machine that stores a queue of all states
+# e.g. ["title_screen", "cutscene_1", "cutscene_2", "planet_1"] (beats world 1) ->
+#      ["title_screen", "cutscene_1", "cutscene_2", "planet_2"] (presses exit button to main menu) ->
+#      ["title_screen"] (loads world 2) ->
+#      ["title_screen", "planet_2"] (loads world 2) ->
+
 class State_Loader:
     def __init__(self, game, start="title_screen"):
         self.game = game
         self.stack: list[State] = []
 
-        self.start = start
+        self.start = start #what the state machine should begin on, useful for debugging to save having to run the entire game
         self.states = {}
 
+    #storing all the states. has to be done post initialisation as the states are created after the State class below
+    #is created
     def populate_states(self):
         from scripts.world_loading.states.title_screen import Title_Screen
         from scripts.world_loading.states.cutscenes import Cutscene_1, Cutscene_2
@@ -29,6 +37,7 @@ class State_Loader:
             "planet_1" : Planet_1(self.game)
         }
 
+        #adding the first state
         if self.start:
             self.add_state(self.states[self.start])
 
@@ -38,6 +47,7 @@ class State_Loader:
     def current_state(self):
         return self.stack[-1]
 
+    #the current state's tilemap, or the last state that has a tilemap
     @property
     def tilemap(self) -> Tilemap:
         if (t := self.current_state.tilemap): return t
@@ -62,6 +72,7 @@ class State_Loader:
 
         #############################################################################
 
+    #the main method, mostly rendering it and all sprite updates
     def update(self):
         self.stack[-1].update()
 
@@ -73,16 +84,15 @@ class State:
         self.screen = self.game.screen
 
         self.name = name
-        self.prev = prev
+        self.prev = prev #the previous state
         self.tilemap = Tilemap(self.game)
         
         self.background = Starry_Background(self.game)
         self.colour_meter = Colour_Meter(self.game, [self.game.all_sprites])
 
     def update(self):
-        # self.screen.fill((0, 0, 0))
         self.background.update()
-        self.game.calculate_offset()
+        self.game.calculate_offset() #camera
         self.render()
 
     def render(self):

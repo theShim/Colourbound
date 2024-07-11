@@ -18,7 +18,7 @@ from scripts.config.SETTINGS import WIDTH, HEIGHT, Z_LAYERS, FRIC, GRAV, CONTROL
 class Player(pygame.sprite.Sprite):
 
     @classmethod
-    def cache_sprites(cls):
+    def cache_sprites(cls): #stores each animation's sprites in its own animator class
         cls.SPRITES = {}
         path = "assets/entities/player"
         for anim in os.listdir(path):
@@ -35,12 +35,8 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self, game, groups: list[pygame.sprite.Group]):
         super().__init__(groups)
-
         self.game = game
-        if self.game != None:
-            self.screen = self.game.screen
-        else:
-            self.screen = pygame.display.get_surface()
+        self.screen = self.game.screen
 
         self.sprites = Player.SPRITES
         self.status = "idle_down"
@@ -49,24 +45,29 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(100, 100))
         self.facing = "down"
 
+        #movement vectors
         self.vel = vec()
         self.acc = vec(0, 0)
         self.run_speed = 60
 
-        self.jump_vel = 50
-        self.jump_height = 0
-        self.max_jump_height = (self.jump_vel ** 2) / (2 * GRAV)
-        self.jump_time = 0
-        self.jumping = False
+        #jumping
+        self.jump_vel = 50 #the velocity applied upwards
+        self.jump_height = 0 #the pseudo height to give the effect of jumping rather than just moving up
+        self.max_jump_height = (self.jump_vel ** 2) / (2 * GRAV) #projectile motion equation
+        self.jump_time = 0 #the current moment in time of the jump
+        self.jumping = False #just a boolean of whether the play is jumping or not
 
+        #gun stuff
         self.shot_held = False
-        self.pointer_first = True
+        self.pointer_first = True #whether the pointer should be blitted behind or infront the player
         
+    #current image
     @property
     def image(self) -> pygame.Surface:
         spr = self.current_sprite.get_sprite()
         return spr
 
+    #current sprite animator
     @property
     def current_sprite(self) -> SpriteAnimator:
         return self.sprites.get(self.status, self.sprites["idle_down"])
@@ -74,13 +75,13 @@ class Player(pygame.sprite.Sprite):
         ###################################################################################### 
 
     def move(self, keys):
-        self.acc = vec(0, 0)
+        self.acc = vec(0, 0) #resetting the acceleration this frame
         
-        self.directional_movement(keys)
+        self.directional_movement(keys) 
         self.jump(keys)
         self.apply_forces()
 
-
+    #moving in the cardinal directions
     def directional_movement(self, keys):
         if keys[CONTROLS["left"]]:
             self.acc.x = -1 * self.run_speed
@@ -92,14 +93,16 @@ class Player(pygame.sprite.Sprite):
         elif keys[CONTROLS["down"]]:
             self.acc.y = 1 * self.run_speed
 
+        #normalizing the acceleration to prevent them going faster in the diagonal directions
         self.acc.clamp_magnitude_ip(self.run_speed)
-        self.change_direction()
+        self.change_direction() #changing the visual sprite depending on direction
 
     def jump(self, keys):
         if keys[CONTROLS["jump"]] and not self.jumping:
             self.jumping = True
             self.jump_time = 0
 
+        #the psuedo height stuff, just projectile motion
         if self.jumping:
             self.jump_time += self.game.dt * 10
             self.jump_height = (self.jump_vel * self.jump_time) - (0.5 * GRAV * (self.jump_time ** 2))
@@ -109,17 +112,19 @@ class Player(pygame.sprite.Sprite):
 
 
     def apply_forces(self):
+        #actually applying acceleration to the player velocity
         self.vel.x += self.acc.x * self.game.dt
         self.vel.y += self.acc.y * self.game.dt
 
-        self.vel *= FRIC
+        self.vel *= FRIC #slowing them down by applying friction
         if -0.5 < self.vel.x < 0.5: #bounds to prevent sliding bug
             self.vel.x = 0
         if -0.5 < self.vel.y < 0.5:
             self.vel.y = 0
 
-        self.rect.topleft += self.vel
+        self.rect.topleft += self.vel #actually applying velocity to the player's position
 
+        #particle trail effect
         if not self.jump_height and self.vel.magnitude():
             for i in range(3):
                 Trail(
@@ -128,6 +133,7 @@ class Player(pygame.sprite.Sprite):
             
         #####################################################################################
 
+    #self explanatory
     def shoot(self):
         mousePos = pygame.mouse.get_pos()
         mouse = pygame.mouse.get_pressed()
@@ -147,6 +153,7 @@ class Player(pygame.sprite.Sprite):
             
         ###################################################################################### 
 
+    #changes the direction depending on the angle its facing to the mouse cursor
     def change_direction(self):
         mousePos = vec(pygame.mouse.get_pos())
         dx = mousePos[0] - (self.rect.centerx - self.game.offset.x)
@@ -170,22 +177,26 @@ class Player(pygame.sprite.Sprite):
         elif -157.5 < angle <= -112.5:
             self.facing = "up_left"
 
+        #adjusting whether the pointer should be blitted first or not
         if self.facing in ["up", "up_right", "up_left"]:
             self.pointer_first = True
         else:
             self.pointer_first = False
 
+        #just differentiating between animations, idle or moving.
         if self.acc.magnitude_squared() == 0:
             self.change_status(f"idle_{self.facing}")
         else:
             self.change_status(f"move_{self.facing}")
 
-        
+
+    #changing the animation
     def change_status(self, status):
         if status != self.status:
             self.current_sprite.reset_frame()
             self.status = status
 
+    #updating the current animation sprite
     def animate(self):
         self.current_sprite.next(self.game.dt)
             
@@ -200,6 +211,7 @@ class Player(pygame.sprite.Sprite):
         self.draw()
 
     def draw(self):
+        #creating a shadow using the current height of jump
         jump_scale = max(0.25, 1 -(self.jump_height / self.max_jump_height))
         y = 10 * jump_scale
         shadow = pygame.Surface((y*4, y), pygame.SRCALPHA)
