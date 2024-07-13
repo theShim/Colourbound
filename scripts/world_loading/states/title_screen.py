@@ -56,6 +56,10 @@ class Title_Screen(State):
         self.titlecard.update()
 
         self.menu_buttons.update()
+
+        if self.controls_button.clicked:
+            self.settings_button.clicked = False
+            
         if self.settings_button.clicked:
             self.sound_button.direction = True
             self.music_button.direction = True
@@ -63,7 +67,7 @@ class Title_Screen(State):
             self.sound_button.direction = self.sound_button.clicked = False
             self.music_button.direction = self.music_button.clicked = False
 
-        if self.titlecard.exit_flag == False:
+        if self.titlecard.exit_flag == False and self.controls_button.controls.direction == False:
             self.alpha += math.radians(1)
             txt = "Press SPACE to Start"
             self.font.render(self.screen, txt, (50, 50, 50), ((2 + WIDTH-self.font.calc_surf_width(txt))/2, 2 + 30 + HEIGHT/2 - self.font.space_height/2), alpha=155 * math.sin(self.alpha) + 100)

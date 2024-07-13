@@ -5,7 +5,8 @@ with contextlib.redirect_stdout(None):
 
 import random
 
-from scripts.utils.CORE_FUNCS import vec, apply_rainbow, gen_rand_colour
+from scripts.gui.custom_fonts import Custom_Font
+from scripts.utils.CORE_FUNCS import vec, apply_rainbow, gen_rand_colour, lerp
 from scripts.config.SETTINGS import WIDTH, HEIGHT
 
     ##############################################################################################
@@ -87,10 +88,17 @@ class Controls_Button(Button):
     def __init__(self, game, groups):
         super().__init__(game, groups, "controls", (5, HEIGHT + 30), (5, HEIGHT - 45))
         self.direction = True
+        self.controls = Controls_Screen(self.game, (-WIDTH, -25), (80, -25))
 
     def update(self):
         self.spring_move_to_dest()
         self.mouse()
+
+        if self.clicked:
+            self.controls.direction = True
+        else:
+            self.controls.direction = False
+        self.controls.update()
 
         self.draw()
 
@@ -130,6 +138,70 @@ class Music_Button(Button):
         self.slider.update()
 
         self.draw()
+
+    ##############################################################################################
+
+class Controls_Screen(pygame.sprite.Sprite):
+    def __init__(self, game, start_pos, final_pos):
+        self.game = game
+        self.screen = self.game.screen
+
+        self.start_pos = vec(start_pos)
+        self.final_pos = vec(final_pos)
+        self.pos = self.start_pos.copy()
+
+        self.direction = False
+        self.spring_vel = vec(0, 0)
+        self.stiffness = 0.2
+        self.damping = 0.2
+
+        self.image = pygame.image.load("assets/gui/info_card.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, vec(self.image.get_size()) * 4.5)
+        self.image.set_colorkey((0, 0, 0))
+
+        text = "Controls"
+        Custom_Font.FluffyBig.render(self.image, text, (30, 30, 30), (102, 27 + 65))
+        Custom_Font.FluffyBig.render(self.image, text, (255, 255, 255), (100, 25 + 65))
+
+        text = """Movement:          WASD
+Shoot or Interact:  Left Mouse Click
+Jump:              Spacebar
+
+...
+that's it :cry:"""
+        Custom_Font.Fluffy.render(self.image, text, (30, 30, 30), (102, 27 + 110))
+        Custom_Font.Fluffy.render(self.image, text, (255, 255, 255), (100, 25 + 110))
+
+        self.dark = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        self.dark.fill((0, 0, 0))
+        self.dark_alpha = 0
+        self.dark.set_alpha(self.dark_alpha)
+
+    def spring_move_to_dest(self):
+        if self.direction:
+            self.spring_vel = self.spring_vel.lerp((self.final_pos - self.pos) * self.stiffness, (self.damping))
+            if self.spring_vel.magnitude() < 0.01:
+                self.pos = self.final_pos.copy()
+            else:
+                self.pos += self.spring_vel
+            self.dark_alpha = lerp(192, self.dark_alpha, 0.3)
+        else:
+            self.spring_vel = self.spring_vel.lerp((self.start_pos - self.pos) * self.stiffness, (self.damping))
+            if self.spring_vel.magnitude() < 0.01:
+                self.pos = self.start_pos.copy()
+            else:
+                self.pos += self.spring_vel
+            self.dark_alpha = lerp(0, self.dark_alpha, 0.3)
+
+    def update(self):
+        self.spring_move_to_dest()
+
+        self.draw()
+
+    def draw(self):
+        self.dark.set_alpha(self.dark_alpha)
+        self.screen.blit(self.dark, (0, 0))
+        self.screen.blit(self.image, self.pos)
 
     ##############################################################################################
 

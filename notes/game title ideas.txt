@@ -1,7 +1,7 @@
-- planet Painter
-- super planet painter
+planet Painter
+super planet painter
 Chromatic Savior
-Colorbound
+~~ Colorbound ~~
 Chromosphere
 Spectrum Shooter
 Stellar Strokes

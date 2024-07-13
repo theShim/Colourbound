@@ -7,6 +7,9 @@ from scripts.world_loading.tilemap import Tilemap
 from scripts.world_loading.backgrounds import Starry_Background
 from scripts.gui.colour_fill_meter import Colour_Meter
 from scripts.gui.player_icon import Player_Icon
+from scripts.gui.custom_fonts import Custom_Font
+
+from scripts.config.SETTINGS import WIDTH, HEIGHT, FPS
 
     ##############################################################################################
 
@@ -98,6 +101,7 @@ class State:
 
         self.bg_music = None
         self.end = False
+        self.start = FPS * 5
 
     def update(self):
         if self.bg_music:
@@ -108,6 +112,13 @@ class State:
         self.background.update()
         self.game.calculate_offset() #camera
         self.render()
+
+        if self.start:
+            text = "Goal: Cover the Entire Map in Paint."
+            size = Custom_Font.Fluffy.calc_surf_width(text), Custom_Font.Fluffy.space_height
+            Custom_Font.Fluffy.render(self.screen, text, (30, 30, 30), (2 + ((WIDTH - size[0]) / 2), 2 + ((HEIGHT - size[1]) / 2)), min(255, self.start))
+            Custom_Font.Fluffy.render(self.screen, text, (123, 119, 239), ((WIDTH - size[0]) / 2, (HEIGHT - size[1]) / 2), min(255, self.start))
+            self.start -= 1
 
     def render(self):
         self.tilemap.render()
