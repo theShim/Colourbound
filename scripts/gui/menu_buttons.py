@@ -6,7 +6,7 @@ with contextlib.redirect_stdout(None):
 import random
 
 from scripts.gui.custom_fonts import Custom_Font
-from scripts.utils.CORE_FUNCS import vec, apply_rainbow, gen_rand_colour, lerp
+from scripts.utils.CORE_FUNCS import vec, apply_rainbow, lerp
 from scripts.config.SETTINGS import WIDTH, HEIGHT
 
     ##############################################################################################

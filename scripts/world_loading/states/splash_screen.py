@@ -3,7 +3,6 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import random, math
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.world_loading.state_machine import State
 

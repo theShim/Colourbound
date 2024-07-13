@@ -9,7 +9,6 @@ import os
 import math
 import numpy as np
 import random
-from scipy.spatial import Voronoi, voronoi_plot_2d
 
 from scripts.objects.pedestal import Pedestal
 

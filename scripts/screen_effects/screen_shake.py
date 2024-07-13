@@ -5,7 +5,7 @@ with contextlib.redirect_stdout(None):
 
 import random
 
-from scripts.utils.CORE_FUNCS import Timer, vec
+from scripts.utils.CORE_FUNCS import vec
 
     ##############################################################################################
 

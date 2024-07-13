@@ -11,9 +11,9 @@ from scripts.projectiles.paint_blob import Paint_Blob
 from scripts.particles.player_floor_trail import Trail
 from scripts.particles.paint_spark import Paint_Spark
 
-from scripts.utils.CORE_FUNCS import vec, lerp, Timer
+from scripts.utils.CORE_FUNCS import vec
 from scripts.utils.sprite_animator import SpriteAnimator
-from scripts.config.SETTINGS import WIDTH, HEIGHT, Z_LAYERS, FRIC, GRAV, CONTROLS, DEBUG, FPS
+from scripts.config.SETTINGS import Z_LAYERS, FRIC, GRAV, CONTROLS
 
     ##############################################################################################
 

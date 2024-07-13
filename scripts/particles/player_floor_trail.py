@@ -3,10 +3,7 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import random
-import os
-
-from scripts.utils.CORE_FUNCS import vec, gen_rand_colour
+from scripts.utils.CORE_FUNCS import vec
 from scripts.config.SETTINGS import Z_LAYERS
 
     ##############################################################################################

@@ -3,10 +3,6 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import os
-import colorsys
-import math
-
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.utils.CORE_FUNCS import vec, Timer
 from scripts.utils.sprite_animator import SpriteAnimator

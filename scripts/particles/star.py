@@ -4,9 +4,7 @@ with contextlib.redirect_stdout(None):
     from pygame.locals import *
 
 import random
-import os
 import math
-import numpy as np
 
 from scripts.utils.CORE_FUNCS import vec, gen_rand_colour
 from scripts.config.SETTINGS import Z_LAYERS, WIDTH, SCREEN_CENTER, HEIGHT

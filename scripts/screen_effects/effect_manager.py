@@ -3,12 +3,6 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import os
-import math
-
-from scripts.utils.CORE_FUNCS import vec, lerp, Timer
-from scripts.config.SETTINGS import WIDTH, HEIGHT, Z_LAYERS, FPS
-
 from scripts.screen_effects.screen_shake import Screen_Shake
 
     ##############################################################################################

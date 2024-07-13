@@ -3,7 +3,7 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import random, math
+import math
 
 from data.dialogues.cutscenes import cutscene_dialogues
 

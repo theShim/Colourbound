@@ -3,12 +3,8 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import os
-import colorsys
-import math
-
-from scripts.utils.CORE_FUNCS import vec, apply_rainbow
-from scripts.config.SETTINGS import WIDTH, Z_LAYERS
+from scripts.utils.CORE_FUNCS import vec
+from scripts.config.SETTINGS import Z_LAYERS
 
     ##############################################################################################
 

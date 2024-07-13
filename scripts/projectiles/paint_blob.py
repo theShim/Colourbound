@@ -3,7 +3,6 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import random
 import math
 
 from scripts.particles.paint_splatter import Paint_Splatter, Paint_Splat

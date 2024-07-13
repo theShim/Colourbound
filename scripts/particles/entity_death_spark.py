@@ -4,7 +4,6 @@ with contextlib.redirect_stdout(None):
     from pygame.locals import *
 
 import random
-import os
 import math
 import numpy as np
 

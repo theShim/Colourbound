@@ -3,7 +3,6 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import os
 import colorsys
 import math
 

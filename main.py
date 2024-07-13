@@ -8,7 +8,6 @@ with contextlib.redirect_stdout(None):
     from pygame.locals import *
     
 import sys
-import time
 import asyncio
 
 from scripts.entities.player import Player

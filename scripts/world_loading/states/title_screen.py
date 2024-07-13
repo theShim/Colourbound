@@ -3,7 +3,7 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-import random, math
+import math
 
 from scripts.entities.spaceship import Spaceship
 from scripts.gui.titlecard import Titlecard
