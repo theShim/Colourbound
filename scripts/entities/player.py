@@ -5,9 +5,11 @@ with contextlib.redirect_stdout(None):
 
 import os
 import math
+import random
 
 from scripts.projectiles.paint_blob import Paint_Blob
 from scripts.particles.player_floor_trail import Trail
+from scripts.particles.paint_spark import Paint_Spark
 
 from scripts.utils.CORE_FUNCS import vec, lerp, Timer
 from scripts.utils.sprite_animator import SpriteAnimator
@@ -141,6 +143,8 @@ class Player(pygame.sprite.Sprite):
         if mouse[0]:
             if self.shot_held == False:
                 self.shot_held = True
+                for i in range(random.randint(2, 4)):
+                    Paint_Spark(self.game, [self.game.all_sprites, self.game.particles], self.rect.center + vec(0, 15 - self.jump_height))
                 Paint_Blob(
                     self.game,
                     [self.game.all_sprites, self.game.projectiles],
@@ -154,15 +158,18 @@ class Player(pygame.sprite.Sprite):
         ###################################################################################### 
 
     def collisions(self):
-        map_: pygame.Surface = self.game.state_loader.current_state.tilemap.map
-        if self.rect.x < 0:
-            self.rect.x = 0
-        elif self.rect.right > map_.get_width():
-            self.rect.right = map_.get_width()
-        if self.rect.y < 0:
-            self.rect.y = 0
-        elif self.rect.bottom > map_.get_height():
-            self.rect.bottom = map_.get_height()
+        try:
+            map_: pygame.Surface = self.game.state_loader.current_state.tilemap.map
+            if self.rect.x < 0:
+                self.rect.x = 0
+            elif self.rect.right > map_.get_width():
+                self.rect.right = map_.get_width()
+            if self.rect.y < 0:
+                self.rect.y = 0
+            elif self.rect.bottom > map_.get_height():
+                self.rect.bottom = map_.get_height()
+        except AttributeError:
+            pass
             
         ###################################################################################### 
 

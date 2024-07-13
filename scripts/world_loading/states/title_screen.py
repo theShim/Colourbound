@@ -8,7 +8,7 @@ import random, math
 from scripts.entities.spaceship import Spaceship
 from scripts.gui.titlecard import Titlecard
 from scripts.gui.custom_fonts import Custom_Font
-from scripts.gui.menu_buttons import Settings_Button, Sound_Button, Music_Button
+from scripts.gui.menu_buttons import Settings_Button, Sound_Button, Music_Button, Controls_Button
 
 from scripts.particles.star import Star_3D
 from scripts.world_loading.state_machine import State
@@ -40,6 +40,7 @@ class Title_Screen(State):
         self.black.set_alpha(self.black_alpha)
 
         self.menu_buttons = pygame.sprite.Group()
+        self.controls_button = Controls_Button(self.game, [self.menu_buttons])
         self.settings_button = Settings_Button(self.game, [self.menu_buttons])
         self.sound_button = Sound_Button(self.game, [self.menu_buttons])
         self.music_button = Music_Button(self.game, [self.menu_buttons])
@@ -82,9 +83,8 @@ class Title_Screen(State):
             if pygame.key.get_pressed()[pygame.K_SPACE]:
                 self.titlecard.exit_flag = True
                 self.spaceship.stage = 1
-                self.settings_button.direction = self.settings_button.clicked = False
-                self.sound_button.direction = self.sound_button.clicked = False
-                self.music_button.direction = self.music_button.clicked = False
+                for button in self.menu_buttons.sprites():
+                    button.direction = button.clicked = False
 
         if self.titlecard.exit_flag:
             self.titlecard.exit()

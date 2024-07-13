@@ -26,7 +26,7 @@ class Colour_Meter(pygame.sprite.Sprite):
         self.fill = pygame.image.load("assets/gui/colour_meter_fill.png").convert_alpha()
         self.fill = pygame.transform.scale(self.fill, vec(self.fill.get_size()) * 2.75)
         self.fill.set_colorkey((0, 0, 0))
-        self.shadow = pygame.mask.from_surface(self.background)#.to_surface(setcolor=(0, 0, 0, 255), unsetcolor=(0, 0, 0, 0))
+        
         self.rect = self.background.get_rect(center=(WIDTH/2, 10 + self.background.get_height() / 2))
 
         self.percent = 50
@@ -38,8 +38,6 @@ class Colour_Meter(pygame.sprite.Sprite):
         self.draw()
 
     def draw(self):
-        # self.screen.blit(self.shadow, self.rect.topleft + vec(2, 2))
-        pygame.draw.polygon(self.screen, (0, 0, 0), [vec(p) + vec(self.rect.topleft) for p in self.shadow.outline()], 5)
         self.screen.blit(self.background, self.rect)
         
         fill = apply_rainbow(

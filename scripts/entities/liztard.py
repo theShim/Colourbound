@@ -138,15 +138,18 @@ class Liztard(pygame.sprite.Sprite):
             if abs(self.true_colored - self.colored) < 0.1:
                 self.colored = self.true_colored
 
-        map_: pygame.Surface = self.game.state_loader.current_state.tilemap.map
-        if self.rect.x < 0:
-            self.rect.x = 0
-        elif self.rect.right > map_.get_width():
-            self.rect.right = map_.get_width()
-        if self.rect.y < 0:
-            self.rect.y = 0
-        elif self.rect.bottom > map_.get_height():
-            self.rect.bottom = map_.get_height()
+        try:
+            map_: pygame.Surface = self.game.state_loader.current_state.tilemap.map
+            if self.rect.x < 0:
+                self.rect.x = 0
+            elif self.rect.right > map_.get_width():
+                self.rect.right = map_.get_width()
+            if self.rect.y < 0:
+                self.rect.y = 0
+            elif self.rect.bottom > map_.get_height():
+                self.rect.bottom = map_.get_height()
+        except AttributeError:
+            pass
         
         ###################################################################################### 
 

@@ -8,28 +8,27 @@ import os
 import math
 import numpy as np
 
-from scripts.utils.CORE_FUNCS import vec
+from scripts.utils.CORE_FUNCS import vec, gen_rand_colour, lerp
 from scripts.config.SETTINGS import Z_LAYERS
 
     ##############################################################################################
 
-class Death_Spark(pygame.sprite.Sprite):
-    def __init__(self, game, groups, pos, scale, angle, speed=None, colour=(255, 255, 255), spin=False, grav=False):
+class Spark(pygame.sprite.Sprite):
+    def __init__(self, game, groups, pos, scale, angle, speed=None, colour=(255, 255, 255), spin=False, grav=False, outline=None):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
         self.z = Z_LAYERS["background particle"]
 
-        self.o_pos = vec(pos)
         self.pos = vec(pos)
-        self.scale = scale * 1.1
+        self.scale = scale
         self.angle = angle
         self.speed = random.uniform(3, 6) if speed == None else speed
         self.colour = colour
 
         self.spin = spin
         self.grav = grav
-        self.dh = 0
+        self.outline = outline
 
         for i in range(int(self.scale*2)+1):
             self.move()
@@ -37,7 +36,6 @@ class Death_Spark(pygame.sprite.Sprite):
 
     def move(self):
         self.pos += vec(math.cos(self.angle), math.sin(self.angle)) * self.speed
-        self.dh = math.sin(self.angle) * (self.o_pos.y - self.pos.y)
 
     def apply_gravity(self, friction, force, terminal_velocity):
         movement = vec(math.cos(self.angle), math.sin(self.angle)) * self.speed
@@ -49,7 +47,7 @@ class Death_Spark(pygame.sprite.Sprite):
     def update(self):
         self.speed -= 0.1
         if self.speed < 0:
-            self.kill()
+            return self.kill()
         
         if self.spin:
             self.angle += 0.1
@@ -66,6 +64,8 @@ class Death_Spark(pygame.sprite.Sprite):
             vec(math.cos(self.angle - math.pi), math.sin(self.angle - math.pi)) * 3 * self.scale * self.speed + vec(random.random(), random.random())*self.speed,
             vec(math.cos(self.angle + math.pi/2), math.sin(self.angle + math.pi/2))  * 0.3 * self.scale * self.speed,
         ])
-        points += (self.pos - self.game.offset)
+        points += self.pos - self.game.offset
         pygame.draw.polygon(self.screen, self.colour, points)
-        pygame.draw.polygon(self.screen, (0, 0, 0), points, 1)
+
+        if self.outline:
+            pygame.draw.polygon(self.screen, self.outline, points, max(1, int(self.scale/4)))

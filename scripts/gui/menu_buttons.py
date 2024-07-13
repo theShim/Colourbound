@@ -83,6 +83,17 @@ class Settings_Button(Button):
 
         self.draw()
 
+class Controls_Button(Button):
+    def __init__(self, game, groups):
+        super().__init__(game, groups, "controls", (5, HEIGHT + 30), (5, HEIGHT - 45))
+        self.direction = True
+
+    def update(self):
+        self.spring_move_to_dest()
+        self.mouse()
+
+        self.draw()
+
 class Sound_Button(Button):
     def __init__(self, game, groups):
         super().__init__(game, groups, "sound", (WIDTH - 100, HEIGHT + 30), (WIDTH - 100, HEIGHT - 45))

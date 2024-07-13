@@ -83,12 +83,16 @@ class Music_Player:
         self.get_channel(channel).fadeout(fadeout_ms)
     
     #change vol with float between 0 and 1 for specified channels
-    def set_vol(self, vol: float, channel="all"):
+    def set_vol(self, vol: float, channel="all", force=False):
         if channel == "all":
             for i, c in enumerate(self.channels):
                 c.set_volume(vol)
                 self.volumes[i] = vol
             return
         
-        self.get_channel(channel).set_volume(vol)
-        self.volumes[self.channels.index(self.get_channel(channel))] = vol #updates volume data store
+        if force:
+            self.get_channel(channel).set_volume(vol)
+            self.volumes[self.channels.index(self.get_channel(channel))] = vol #updates volume data store
+        else:
+            clamp = self.volumes[self.channels.index(self.get_channel(channel))]
+            self.get_channel(channel).set_volume(vol * clamp)

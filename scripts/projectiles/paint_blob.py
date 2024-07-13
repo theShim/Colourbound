@@ -66,6 +66,9 @@ class Paint_Blob(pygame.sprite.Sprite):
 
             splat.kill()
             self.kill()
+            return
+
+        self.game.state_loader.tilemap.changed = False
 
         self.move()
         self.draw()
