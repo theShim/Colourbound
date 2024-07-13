@@ -21,6 +21,7 @@ SOUNDS = {
     "title_screen" : Sound("music/title_screen.wav"),
     "into_space" : Sound("music/into_space.wav"),
     "warp_speed" : Sound("music/warp_speed.wav"),
+    "rumble" : Sound("music/rumble.mp3"),
     "typing" : Sound("music/typing.wav"),
     "falling_in_space" : Sound("music/falling_out_of_sky.wav"),
     "paint_splat_1" : Sound("music/paint_splat_1.wav"),

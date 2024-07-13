@@ -11,7 +11,7 @@ gun and these beautiful, colourful stars. \t
 """,
     2 : """
 IT'S SO BORING! All I do all day is sit
-in this tin can playing AFK Arena, waiting
+in this tin can playing Minecraft, waiting
 for someone to need my damn paint.
 """,
     3 : """
@@ -20,7 +20,7 @@ powered by colour so I'll always stay with
 you. \t\tUnless something really bad happens.
 """,
     4 : """
-What the hell just happened?
+What the hell just happened? \t\t\t
 It's like the colour of well, 
 everything is just gone.
 """,

@@ -16,6 +16,7 @@ from scripts.entities.spaceship import Spaceship, Spaceship_Side, Spaceship_Fidg
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.gui.dialogue_box import Press_Spacebar
 from scripts.music.music_player import Music_Player
+from scripts.objects.pedestal import Pedestal
 from scripts.particles.colour_void_shockwave import Shockwave_Particle
 from scripts.particles.paint_splatter import Paint_Splat
 from scripts.particles.star import Star_3D
@@ -63,17 +64,17 @@ class Game:
         self.entities = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
         self.particles = pygame.sprite.Group()
+        
+        #the player object stored here just so its "universally" accessibly
+        self.player = Player(self, groups=[self.all_sprites, self.entities])
 
         #the finite state machine responsible for the current scene in game.
-        self.state_loader = State_Loader(self, "title_screen")
+        self.state_loader = State_Loader(self, "splash_screen")
         self.state_loader.populate_states() #initialising all the states
 
         #vfx and sfx stuff
         self.effect_manager = Effect_Manager(self)
         self.music_player = Music_Player()
-        
-        #the player object stored here just so its "universally" accessibly
-        self.player = Player(self, groups=[self.all_sprites, self.entities])
         
     #caching all the sprites at the beginning of the game to avoid repetitive image loading which takes time
     def cache_sprites(self):
@@ -88,6 +89,7 @@ class Game:
         Press_Spacebar.cache_sprites()
         Star_3D.cache_sprites()
         Background_Star.cache_sprites()
+        Pedestal.cache_sprites()
 
     def initialise(self):
         pygame.init()  #general pygame
@@ -138,7 +140,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_q:
+                    if event.key == pygame.K_ESCAPE:
                         running = False
                     
             # self.screen.fill((0, 0, 0))

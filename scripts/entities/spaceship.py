@@ -270,3 +270,24 @@ class Spaceship_Fidget_Spinner(pygame.sprite.Sprite):
         rotated_rect = image.get_rect(center=self.rect.center)
         
         self.screen.blit(image, rotated_rect.topleft - self.game.offset)
+
+class Fallen_Ship(pygame.sprite.Sprite):
+    def __init__(self, game, groups, pos):
+        super().__init__(groups)
+        self.game = game
+        self.screen = self.game.screen
+        self.z = Z_LAYERS["player"] - 0.1
+
+        path = "assets/entities/spaceship_fidget_spinner/idle"
+        self.image = pygame.image.load(path + "/0.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, vec(self.image.get_size()) * 3)
+        self.image = pygame.transform.rotate(self.image, 225)
+        self.image = self.image.subsurface([0, 0, self.image.get_width(), self.image.get_height() * 0.6])
+        pygame.transform.grayscale(self.image, self.image)
+        self.rect = self.image.get_rect(midbottom = pos)
+
+    def update(self):
+        self.draw()
+
+    def draw(self):
+        self.screen.blit(self.image, self.rect.topleft - self.game.offset)

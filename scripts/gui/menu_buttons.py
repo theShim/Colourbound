@@ -3,7 +3,9 @@ with contextlib.redirect_stdout(None):
     import pygame
     from pygame.locals import *
 
-from scripts.utils.CORE_FUNCS import vec
+import random
+
+from scripts.utils.CORE_FUNCS import vec, apply_rainbow, gen_rand_colour
 from scripts.config.SETTINGS import WIDTH, HEIGHT
 
     ##############################################################################################
@@ -14,6 +16,15 @@ class Button(pygame.sprite.Sprite):
         self.game = game
         self.screen = self.game.screen
 
+        self.start_pos = vec(pos)
+        self.end_pos = vec(end_pos)
+        self.pos = self.start_pos.copy()
+
+        self.direction = False
+        self.spring_vel = vec(0, 0)
+        self.stiffness = 0.1
+        self.damping = 0.3
+
         path = "assets/gui"
         self.base_surf = pygame.image.load(f"{path}/{name}_0.png").convert_alpha()
         self.base_surf.set_colorkey((0, 0, 0))
@@ -22,16 +33,10 @@ class Button(pygame.sprite.Sprite):
         self.clicked_surf.set_colorkey((0, 0, 0))
         self.clicked_surf = pygame.transform.scale(self.clicked_surf, vec(self.clicked_surf.get_size()) * 1.25)
 
-        self.o_pos = vec(pos).copy()
-        self.pos = vec(pos)
-        self.end_pos = vec(end_pos)
+        self.rect = self.base_surf.get_rect(topleft=self.pos)
 
         self.clicked = False
-        self.held = False
         self.hovered = False
-        self.new = False
-
-        self.slider = None
 
     def mouse(self):
         mousePos = pygame.mouse.get_pos()
@@ -41,203 +46,185 @@ class Button(pygame.sprite.Sprite):
         if self.rect.collidepoint(mousePos):
             self.hovered = True
 
-            if mouse[0]:
+        if mouse[0]:
+            if self.rect.collidepoint(mousePos):
                 if self.held == False:
                     self.held = True
                     self.clicked = not self.clicked
-                    self.new = True
-            else:
-                self.held = False
+        else:
+            self.held = False
 
-    def action(self):
-        pass
-            
-
-    def update(self):
         self.rect = self.base_surf.get_rect(topleft=self.pos)
-        self.mouse()
-        self.action()
 
-        self.draw()
+    def spring_move_to_dest(self):
+        if self.direction:
+            self.spring_vel = self.spring_vel.lerp((self.end_pos - self.pos) * self.stiffness, (self.damping))
+            self.pos += self.spring_vel
+        else:
+            self.spring_vel = self.spring_vel.lerp((self.start_pos - self.pos) * self.stiffness, (self.damping))
+            self.pos += self.spring_vel
 
     def draw(self):
-        if self.slider:
-            self.slider.update(self.game.music_player)
-
         if self.clicked or self.hovered:
             self.screen.blit(self.clicked_surf, self.rect)
         else:
             self.screen.blit(self.base_surf, self.rect)
 
-
+            ##############################################################################
 
 class Settings_Button(Button):
     def __init__(self, game, groups):
         super().__init__(game, groups, "settings", (WIDTH - 55, HEIGHT + 30), (WIDTH - 55, HEIGHT - 45))
-        self.move_flag = True
-        self.spring_vel = vec(0, 0)
-        self.stiffness = 0.2
-        self.damping = 0.2
+        self.direction = True
 
-    def action(self):
-        if self.move_flag:
-            self.spring_vel = self.spring_vel.lerp((self.end_pos - self.pos) * self.stiffness, self.damping)
-            self.pos += self.spring_vel
-        else:
-            self.spring_vel = self.spring_vel.lerp((self.o_pos - self.pos) * self.stiffness, (self.damping))
-            self.pos += self.spring_vel
+    def update(self):
+        self.spring_move_to_dest()
+        self.mouse()
 
-        if self.new:
-            if self.clicked:
-                for spr in self.groups()[0]:
-                    if spr != self:
-                        spr.move_flag = True
-                        spr.spring_vel = vec()
-            else:
-                for spr in self.groups()[0]:
-                    if spr != self:
-                        spr.move_flag = False
-                        spr.spring_vel = vec()
-            self.new = False
+        self.draw()
 
 class Sound_Button(Button):
     def __init__(self, game, groups):
         super().__init__(game, groups, "sound", (WIDTH - 100, HEIGHT + 30), (WIDTH - 100, HEIGHT - 45))
-        self.move_flag = False
-        self.spring_vel = vec(0, 0)
-        self.stiffness = 0.2
-        self.damping = 0.2
+        self.slider = Sound_Slider(game)
 
-        self.slider = Sound_Slider(self.game, (WIDTH - 100, HEIGHT - 50))
+    def update(self):
+        self.spring_move_to_dest()
+        if not self.slider.held:
+            self.mouse()
 
-    def action(self):
-        if self.move_flag:
-            self.spring_vel = self.spring_vel.lerp((self.end_pos - self.pos) * self.stiffness, self.damping)
-            self.pos += self.spring_vel + vec(0, 0)
+        if self.clicked:
+            self.slider.direction = True
         else:
-            self.spring_vel = self.spring_vel.lerp((self.o_pos - self.pos) * self.stiffness, (self.damping))
-            self.pos += self.spring_vel
+            self.slider.direction = False
+        self.slider.update()
+
+        self.draw()
+
 
 class Music_Button(Button):
     def __init__(self, game, groups):
-        super().__init__(game, groups, "music", (WIDTH - 145, HEIGHT + 30), (WIDTH - 145, HEIGHT - 45))   
-        self.move_flag = False
+        super().__init__(game, groups, "music",(WIDTH - 145, HEIGHT + 30), (WIDTH - 145, HEIGHT - 45))
+        self.slider = Music_Slider(game)
+
+    def update(self):
+        self.spring_move_to_dest()
+        if not self.slider.held:
+            self.mouse()
+
+        if self.clicked:
+            self.slider.direction = True
+        else:
+            self.slider.direction = False
+        self.slider.update()
+
+        self.draw()
+
+    ##############################################################################################
+
+class Slider(pygame.sprite.Sprite):
+    def __init__(self, game, start_pos, final_pos):
+        self.game = game
+        self.screen = self.game.screen
+
+        self.start_pos = vec(start_pos)
+        self.final_pos = vec(final_pos)
+        self.pos = self.start_pos.copy()
+
+        self.direction = False
         self.spring_vel = vec(0, 0)
         self.stiffness = 0.2
         self.damping = 0.2
 
-    def action(self):
-        if self.move_flag:
-            self.spring_vel = self.spring_vel.lerp((self.end_pos - self.pos) * self.stiffness, self.damping)
-            self.pos += self.spring_vel + vec(0, 0)
+        self.frame = pygame.image.load("assets/gui/slider.png").convert_alpha()
+        self.frame = pygame.transform.scale(self.frame, vec(self.frame.get_size()) * 1.25)
+        self.frame.set_colorkey((0, 0, 0))
+
+        self.knob = pygame.image.load("assets/gui/knob.png").convert_alpha()
+        self.knob = pygame.transform.scale(self.knob, vec(self.knob.get_size()) * 1.25)
+        self.knob.set_colorkey((0, 0, 0))
+
+        self.knob_min = vec(5, self.frame.get_height() - self.knob.get_height() - 10)
+        self.knob_max = vec(5, 5)
+        self.knob_pos = self.knob_max.copy()
+        self.held = False
+
+        self.channel = None
+        self.last_vol = 1.0
+        
+        self.slider_fill = pygame.Surface((self.frame.get_width() - 10, self.frame.get_height() - 10), pygame.SRCALPHA)
+        self.slider_fill.fill((120, 120, 120))
+        self.animation_period = 700
+        self.elapsed_time = random.randint(0, 700)
+
+    def spring_move_to_dest(self):
+        if self.direction:
+            self.spring_vel = self.spring_vel.lerp((self.final_pos - self.pos) * self.stiffness, (self.damping))
+            self.pos += self.spring_vel
         else:
-            self.spring_vel = self.spring_vel.lerp((self.o_pos - self.pos) * self.stiffness, (self.damping))
+            self.spring_vel = self.spring_vel.lerp((self.start_pos - self.pos) * self.stiffness, (self.damping))
             self.pos += self.spring_vel
 
+    def knob_move(self):
+        knob_rect = self.knob.get_rect(topleft=self.knob_pos + vec(self.pos.x, (self.pos.y - self.frame.height)))
+        
+        if pygame.mouse.get_pressed()[0]:
+            if self.held == False:
+                if knob_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.held = True
+        else:
+            self.held = False
 
-class Sound_Slider(pygame.sprite.Sprite):
-    def __init__(self, game, pos):
-        self.game = game
-        self.screen = self.game.screen
+        if self.held:
+            self.knob_pos.y = pygame.mouse.get_pos()[1] - self.pos.y + self.frame.height
 
-        self.pos = pos
+    def clamp_pos(self):
+        if self.knob_pos.y > self.knob_min.y:
+            self.knob_pos.y = self.knob_min.y
+        if self.knob_pos.y < self.knob_max.y:
+            self.knob_pos.y = self.knob_max.y
 
-        self.base = pygame.Surface((7, 27))
-        self.base.fill((20, 16,32))
+    def change_vol(self, mixer):
+        dist = abs(self.knob_min.y - self.knob_pos.y)
+        vol = dist / abs(self.knob_max.y - self.knob_min.y)
+        if vol != self.last_vol:
+            self.last_vol = vol
+            mixer.set_vol(vol, self.channel)
 
-    def update(self, mixer):
+    def update(self):
+        self.spring_move_to_dest()
+
+        if self.spring_vel.magnitude() < 1:
+            self.knob_move()
+        self.clamp_pos()
+        self.change_vol(self.game.music_player)
+
+        self.elapsed_time += self.game.dt * 1000
+
         self.draw()
 
     def draw(self):
-        self.screen.blit(self.base, self.base.get_rect(bottomleft=self.pos))
+        fill = self.slider_fill.copy()
+        fill = apply_rainbow(
+            fill,
+            offset=(self.animation_period - self.elapsed_time) / self.animation_period,
+            bands=1.5
+        )
+        fill = fill.subsurface([0, self.knob_pos.y, fill.get_width(), fill.get_height() - self.knob_pos.y])
+        self.screen.blit(fill, self.frame.get_rect(bottomleft=self.pos + vec(5, self.knob_pos.y)))
 
+        frame = self.frame.copy()
+        frame.blit(self.knob, self.knob_pos)
+        self.screen.blit(frame, frame.get_rect(bottomleft=self.pos))
 
+class Sound_Slider(Slider):
+    def __init__(self, game):
+        super().__init__(game, (WIDTH-100, HEIGHT + 150), (WIDTH - 100, HEIGHT - 50))
+        self.direction = True
+        self.channel = "all"
 
-    # class Volume_Slider(pygame.sprite.Sprite):
-    #     def __init__(self, parent, mixer, pos):
-    #         super().__init__()
-    #         self.parent = parent
-    #         self.mixer = mixer
-    #         self.pos = pos
-
-    #         self.base = pygame.Surface((72, 7), pygame.SRCALPHA)
-    #         self.base.fill((20, 16, 32))
-    #         self.base.fill((39, 37, 60), [0, 0, 72, 2])
-    #         self.base = pygame.transform.scale(self.base, vec(self.base.get_size()) * 3)
-    #         pygame.draw.rect(self.base, (1, 0, 0), self.base.get_rect(), 3)
-
-    #         self.knob = Player_Menu.Volume_Knob(self, self.mixer, 
-    #                                             [self.pos[0] + 3, self.pos[1] - 6], 
-    #                                             [self.pos[0] + self.base.get_width() - 33 - 3, self.pos[1] - 6])
-
-    #     def update(self, screen):
-    #         screen.blit(self.base, self.pos)
-
-    #         pygame.draw.rect(screen, [17, 158, 214], [self.pos[0] + 3, self.pos[1] + 3, int(self.knob.pos.x - self.knob.start.x), 3])
-    #         pygame.draw.rect(screen, [65, 243, 252], [self.pos[0] + 3, self.pos[1] + 6, int(self.knob.pos.x - self.knob.start.x), 12])
-
-    #         vol = str(int(self.mixer.volumes[0] * 100))
-    #         Custom_Font.Fluffy.render(screen, str(vol), (41, 39, 62), [self.pos[0] + self.base.get_width() + 11, self.pos[1] + 5])
-    #         Custom_Font.Fluffy.render(screen, str(vol), (210, 210, 210), [self.pos[0] + self.base.get_width() + 10, self.pos[1] + 4])
-
-    #         Custom_Font.Fluffy.render(screen, "Music:", (41, 39, 62), [self.pos[0] - Custom_Font.Fluffy.calc_surf_width("Music:") - 4, self.pos[1] + 5])
-    #         Custom_Font.Fluffy.render(screen, "Music:", (210, 210, 210), [self.pos[0] - Custom_Font.Fluffy.calc_surf_width("Music:") - 5, self.pos[1] + 4])
-
-    #         self.knob.update(screen)
-
-    # class Volume_Knob(pygame.sprite.Sprite):
-    #     def __init__(self, parent, mixer, start, end):
-    #         super().__init__()
-    #         self.parent = parent
-    #         self.mixer = mixer
-
-    #         self.start = vec(start)
-    #         self.end = vec(end)
-    #         self.pos = vec(end)
-
-    #         self.base = pygame.Surface((14-3, 14-3), pygame.SRCALPHA)
-    #         self.base.fill((57, 58, 74))
-    #         pygame.draw.rect(self.base, (1, 0, 0), self.base.get_rect(), 1)
-    #         pygame.draw.line(self.base, (20, 16, 32), [2, 2], [2, 11-3])
-    #         pygame.draw.line(self.base, (20, 16, 32), [11-3, 2], [11-3, 11-3])
-    #         pygame.draw.line(self.base, (30, 23, 48), [3, 2], [10-3, 2])
-    #         pygame.draw.line(self.base, (30, 23, 48), [3, 11-3], [10-3, 11-3])
-    #         self.base = pygame.transform.scale(self.base, vec(self.base.get_size())*3)
-
-    #         self.held = False
-
-    #     def clamp_pos(self):
-    #         if self.pos.x < self.start.x:
-    #             self.pos.x = self.start.x
-    #         if self.pos.x > self.end.x:
-    #             self.pos.x = self.end.x
-
-    #     def change_volume(self):
-    #         dist = abs(self.start.x - self.pos.x)
-    #         vol = dist / (self.end.x - self.start.x)
-    #         self.mixer.set_vol(vol, "bg")
-
-    #     def move(self):
-    #         mouse = pygame.mouse.get_pressed()
-    #         mousePos = pygame.mouse.get_pos()
-
-    #         if mouse[0]:
-    #             if self.held == False:
-    #                 if self.base.get_rect(topleft=self.pos).collidepoint(mousePos):
-    #                     self.held = True
-    #             else:
-    #                 self.pos.x = mousePos[0] - self.base.get_width()/2
-    #                 self.clamp_pos()
-    #                 self.change_volume()
-    #         else:
-    #             self.held = False
-
-    #     def update(self, screen):
-    #         self.move()
-
-    #         screen.blit(self.base, self.pos)
-    #         if self.base.get_rect(topleft=self.pos).collidepoint(pygame.mouse.get_pos()) or self.held:
-    #             pygame.draw.rect(screen, [65, 243, 252], [self.pos.x + 6, self.pos.y + 6, 3, 21])
-    #             pygame.draw.rect(screen, [65, 243, 252], [self.pos.x + self.base.get_width() - 9, self.pos.y + 6, 3, 21])
-    #             pygame.draw.rect(screen, [17, 158, 214], [self.pos.x + 6, self.pos.y + 6, 21, 3])
-    #             pygame.draw.rect(screen, [17, 158, 214], [self.pos.x + 6, self.pos.y + self.base.get_height() - 9, 21, 3])
+class Music_Slider(Slider):
+    def __init__(self, game):
+        super().__init__(game, (WIDTH-145, HEIGHT + 150), (WIDTH - 145, HEIGHT - 50))
+        self.direction = True
+        self.channel = "bg"

@@ -31,7 +31,7 @@ class Music_Player:
         ]
         self.volumes: list[float] = [ #needs to be the same order as self.channels
             1.,
-            0.5,
+            0.25,
             1.,
             1,
         ]

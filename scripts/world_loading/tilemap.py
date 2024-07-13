@@ -8,7 +8,10 @@ from tkinter.filedialog import asksaveasfile, askopenfilename
 import os
 import math
 import numpy as np
-import asyncio
+import random
+from scipy.spatial import Voronoi, voronoi_plot_2d
+
+from scripts.objects.pedestal import Pedestal
 
 from scripts.utils.CORE_FUNCS import vec, crop
 from scripts.config.SETTINGS import TILE_SIZE, WIDTH, HEIGHT
@@ -54,6 +57,46 @@ class Tilemap:
 
         self.grey_map = pygame.transform.grayscale(self.map)
         self.to_fill = self.grey_map.width * self.grey_map.height
+
+    def add_pedestals(self):
+
+        def generate_points(n, size, buffer, min_dist=200):
+            points = [vec(random.uniform(buffer, size[0] - buffer), random.uniform(buffer, size[1] - buffer)) for i in range(n)]
+            # flag = True
+            # while flag:
+            #     flag = False
+            #     for p1 in points:
+            #         for p2 in points:
+            #             if p1 != p2:
+            #                 if p1.distance_to(p2) < min_dist:
+            #                     dy = p2.y - p1.y
+            #                     dx = p2.x - p1.x
+            #                     angle = math.atan2(dy, dx)
+            #                     p1 += vec(math.cos(angle), math.sin(angle)) * 10
+            #                     p2 -= vec(math.cos(angle), math.sin(angle)) * 10
+            #                     flag = True
+
+            #                     old_p1 = p1.copy
+            #                     p1.x = sorted([buffer, WIDTH - buffer, p1.x])[1]
+            #                     p1.y = sorted([buffer, HEIGHT - buffer, p1.y])[1]
+            #                     if old_p1 != p1: flag = False
+                                
+            #                     old_p2 = p2.copy
+            #                     p2.x = sorted([buffer, WIDTH - buffer, p2.x])[1]
+            #                     p2.y = sorted([buffer, HEIGHT - buffer, p2.y])[1]
+            #                     if old_p2 != p2: flag = False
+                                
+            return points
+
+        def get_radius(point, points):
+            nearest_radius = math.inf
+            for p in points:
+                if 0 < (dist := p.distance_to(point)) < nearest_radius:
+                    nearest_radius = dist
+            return nearest_radius
+        
+        for pos in (points := sorted(generate_points(8, self.map.get_size(), 50, min_dist=200), key=lambda p: p.y)):
+            Pedestal(self.game, [self.game.all_sprites], pos, radius = get_radius(pos, points) * 1)
 
             ##############################################################################
 
@@ -135,6 +178,7 @@ class Tilemap:
             self.max_tile_x = len(tile_x)
             self.max_tile_y = len(tile_y)
             self.generate_map([self.max_tile_x, self.max_tile_y], [lowest_x, lowest_y])
+            self.add_pedestals()
 
     def auto_tile(self):
         pass
@@ -150,10 +194,7 @@ class Tilemap:
     async def colour_calculator(self):
         if self.changed:
             arr = pygame.surfarray.array3d(self.grey_map)
-            # clear = np.all(arr == [0, 0, 0], axis=-1)
-            # clear = np.all(arr == 0, axis=-1)
             clear = np.logical_and.reduce(arr == 0, axis=-1)
-            # self.filled = np.sum(clear)
             self.filled = np.count_nonzero(clear)
             self.changed = False
 

@@ -12,6 +12,7 @@ TILE_SIZE = 32
 #blitting order of sprites, tilemap goes before this
 Z_LAYERS = {
     "background particle" : 3,
+    "pedestal" : 4,
     "player" : 5,
     "projectile" : 7,
     "foreground particle" : 8,

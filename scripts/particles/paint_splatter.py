@@ -12,7 +12,7 @@ from scripts.config.SETTINGS import Z_LAYERS
     ##############################################################################################
 
 class Paint_Splatter(pygame.sprite.Sprite):
-    def __init__(self, game, groups, pos, vel=None):
+    def __init__(self, game, groups, pos, vel=None, size=1):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
@@ -21,12 +21,12 @@ class Paint_Splatter(pygame.sprite.Sprite):
         self.pos = pos
         self.vel = vel or vec(random.uniform(-1, 1), random.uniform(-1, 1)) * random.uniform(0, 1.8)
         self.colour = gen_rand_colour(vibrant=True)
-        self.radius = random.uniform(2, 4)
+        self.radius = size * random.uniform(2, 4)
         self.decay = random.uniform(0.1, 0.3)
 
         self.alpha_qt = random.randint(2, 4)
         self.alpha_glow = random.uniform(1.5, 3)
-        self.max_size = 2 * self.radius * self.alpha_glow * self.alpha_qt ** 2
+        self.max_size = size * 2 * self.radius * self.alpha_glow * self.alpha_qt ** 2
 
     def update(self):
         self.radius -= self.decay
@@ -84,14 +84,6 @@ class Paint_Splat(pygame.sprite.Sprite):
         self.pos = pos
         self.rect = self.image.get_rect(center=self.pos)
         self.game.state_loader.tilemap.changed = True
-
-        # if self.game.music_player.is_playing("sfx") and self.game.music_player.is_playing("splat"):
-        #     if self.SPLAT_COOLDOWN > 0
-
-        # if self.SPLAT_COOLDOWN > 0:
-        #     self.SPLAT_COOLDOWN -= 1
-        # else:
-        #     self.SPLAT_COOLDOWN = 5
 
         self.kill()
             

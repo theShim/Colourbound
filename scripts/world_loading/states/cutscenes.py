@@ -9,6 +9,7 @@ from data.dialogues.cutscenes import cutscene_dialogues
 
 from scripts.entities.spaceship import Spaceship_Side, Spaceship_Fidget_Spinner
 from scripts.gui.dialogue_box import Dialogue_Box
+from scripts.gui.custom_fonts import Custom_Font
 from scripts.particles.star import Star_3D, Falling_Down_Star
 from scripts.particles.colour_void_shockwave import Shockwave_Particle
 from scripts.world_loading.state_machine import Cutscene
@@ -101,7 +102,7 @@ class Cutscene_1(Cutscene):
 
         self.stage_5_pause = Timer(FPS*1.5, 1)
         self.stage_7_pause = Timer(FPS*2, 1)
-        self.stage_10_pause = Timer(FPS*0.8, 1)
+        self.stage_10_pause = Timer(FPS*1.5, 1)
 
         self.game.offset = vec()
         self.stage = 0
@@ -116,9 +117,9 @@ class Cutscene_1(Cutscene):
         self.spaceship.update()
 
         if self.stage == 0:
-            if not self.game.music_player.is_playing("bg"):
-                self.game.music_player.set_vol(vol=1, channel="bg")
-                self.game.music_player.play(self.bg_music, "bg", loop=True, fade_in=1000)
+            self.game.music_player.stop(channel="bg")
+            self.game.music_player.set_vol(vol=1, channel="bg")
+            self.game.music_player.play(self.bg_music, "bg", loop=True, fade_in=1000)
 
             if self.black_alpha > 0:
                 self.black_alpha -= 5
@@ -162,6 +163,7 @@ class Cutscene_1(Cutscene):
                 self.spaceship.grey_switch()
 
             self.colourvoid_particles.update(self.colourvoid_radius)
+            self.game.music_player.play("rumble", "sfx")
             self.game.effect_manager.effects["screen shake"].start(int(FPS*0.25), intensity=2)
 
             if self.colourvoid_radius >= 1100:
@@ -171,6 +173,7 @@ class Cutscene_1(Cutscene):
                     self.stage = 5
 
         elif self.stage == 5:
+            self.game.music_player.stop("sfx")
             self.stage_5_pause.update()
             if self.stage_5_pause.finished:
                 self.stage = 6
@@ -220,14 +223,6 @@ class Cutscene_1(Cutscene):
             else:
                 self.stars.empty()
                 self.game.state_loader.add_state(self.game.state_loader.states["cutscene_2"])
-
-        elif self.stage == 12:
-            if self.black_alpha > 0:
-                self.black_alpha -= 20
-                self.black.set_alpha(self.black_alpha)
-                self.screen.blit(self.black, (0, 0))
-            else:
-                self.stage = 13
 
 
 
@@ -286,3 +281,46 @@ class Cutscene_2(Cutscene):
                 self.screen.blit(self.black, (0, 0))
             else:
                 self.game.state_loader.add_state(self.game.state_loader.states["planet_1"])
+
+
+
+class Ending(Cutscene):
+    def __init__(self, game, prev):
+        super().__init__(game, "ending", prev)
+
+        self.black = pygame.Surface((WIDTH, HEIGHT))
+        self.black.fill((0, 0, 0))
+        self.black_alpha = 0
+        self.black.set_alpha(self.black_alpha)
+
+        self.timer = 100
+
+        self.prev = prev
+        self.stage = 0
+
+    def update(self):
+        if self.black_alpha > 0 and self.stage == 0:
+            self.prev.render()
+
+        if self.stage == 0:
+            if self.black_alpha < 255:
+                self.black_alpha += 10
+            else:
+                self.black_alpha = 255
+                self.stage = 1
+            self.black.set_alpha(self.black_alpha)
+            self.game.screen.blit(self.black, (0, 0))
+
+        else:
+            self.game.screen.fill((0, 0, 0))
+
+        if self.stage == 1:
+            self.game.music_player.stop("all", fadeout_ms=5000)
+            self.timer -= 1
+            if self.timer == 0:
+                self.stage = 2
+
+        elif self.stage == 2:
+            text = "sorry i ran out of time bruh. press ESCAPE to quit"
+            size = Custom_Font.Fluffy.calc_surf_width(text)
+            Custom_Font.Fluffy.render(self.game.screen, text, (255, 255, 255), (100, 100))

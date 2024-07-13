@@ -6,6 +6,7 @@ with contextlib.redirect_stdout(None):
 from scripts.world_loading.tilemap import Tilemap
 from scripts.world_loading.backgrounds import Starry_Background
 from scripts.gui.colour_fill_meter import Colour_Meter
+from scripts.gui.player_icon import Player_Icon
 
     ##############################################################################################
 
@@ -16,7 +17,7 @@ from scripts.gui.colour_fill_meter import Colour_Meter
 #      ["title_screen", "planet_2"] (loads world 2) ->
 
 class State_Loader:
-    def __init__(self, game, start="title_screen"):
+    def __init__(self, game, start="splash_screen"):
         self.game = game
         self.stack: list[State] = []
 
@@ -26,11 +27,13 @@ class State_Loader:
     #storing all the states. has to be done post initialisation as the states are created after the State class below
     #is created
     def populate_states(self):
+        from scripts.world_loading.states.splash_screen import Splash_Screen
         from scripts.world_loading.states.title_screen import Title_Screen
         from scripts.world_loading.states.cutscenes import Cutscene_1, Cutscene_2
         from scripts.world_loading.states.planet_1 import Planet_1
 
         self.states = {
+            "splash_screen" : Splash_Screen(self.game),
             "title_screen" : Title_Screen(self.game),
             "cutscene_1" : Cutscene_1(self.game),
             "cutscene_2" : Cutscene_2(self.game),
@@ -50,9 +53,11 @@ class State_Loader:
     #the current state's tilemap, or the last state that has a tilemap
     @property
     def tilemap(self) -> Tilemap:
-        if (t := self.current_state.tilemap): return t
-        else:
-            for i in range(len(self.states)-2, -1, -1):
+        try:
+            t = self.current_state.tilemap
+            return t
+        except AttributeError:
+            for i in range(len(self.stack)-2, -1, -1):
                 if (t := self.stack[i].tilemap): 
                     break
             else:
@@ -89,8 +94,17 @@ class State:
         
         self.background = Starry_Background(self.game)
         self.colour_meter = Colour_Meter(self.game, [self.game.all_sprites])
+        self.player_icon = Player_Icon(self.game, [self.game.all_sprites], (10, 10))
+
+        self.bg_music = None
+        self.end = False
 
     def update(self):
+        if self.bg_music:
+            if not self.game.music_player.is_playing("bg"):
+                self.game.music_player.set_vol(vol=1, channel="bg")
+                self.game.music_player.play(self.bg_music, "bg", loop=True, fade_in=1000)
+
         self.background.update()
         self.game.calculate_offset() #camera
         self.render()
@@ -98,6 +112,12 @@ class State:
     def render(self):
         self.tilemap.render()
         self.colour_meter.percent = (self.tilemap.filled / self.tilemap.to_fill) * 100
+
+        if self.end == False:
+            from scripts.world_loading.states.cutscenes import Ending
+            if self.colour_meter.percent >= 97:
+                self.end = True
+                self.game.state_loader.add_state(Ending(self.game, self))
 
         for spr in sorted(self.game.all_sprites.sprites(), key=lambda s: s.z):
             spr.update()

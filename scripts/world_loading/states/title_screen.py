@@ -36,30 +36,31 @@ class Title_Screen(State):
 
         self.black = pygame.Surface((WIDTH, HEIGHT))
         self.black.fill((0, 0, 0))
-        self.black_alpha = 0
+        self.black_alpha = 455
         self.black.set_alpha(self.black_alpha)
 
         self.menu_buttons = pygame.sprite.Group()
-        Settings_Button(self.game, [self.menu_buttons])
-        Sound_Button(self.game, [self.menu_buttons])
-        Music_Button(self.game, [self.menu_buttons])
+        self.settings_button = Settings_Button(self.game, [self.menu_buttons])
+        self.sound_button = Sound_Button(self.game, [self.menu_buttons])
+        self.music_button = Music_Button(self.game, [self.menu_buttons])
 
         self.bg_music = "title_screen"
         self.start = True
 
     def update(self):
-        if self.start:
-            self.start = False
-            self.game.music_player.play(self.bg_music, "bg", loop=True)
-
         self.screen.blit(self.bg, (0, 0))
         
         self.stars.update()
-        # self.game.debugger.add_text(f"{(180 / math.pi) * (Star_3D.angle)}")
-
         self.spaceship.update()
+        self.titlecard.update()
 
         self.menu_buttons.update()
+        if self.settings_button.clicked:
+            self.sound_button.direction = True
+            self.music_button.direction = True
+        else:
+            self.sound_button.direction = self.sound_button.clicked = False
+            self.music_button.direction = self.music_button.clicked = False
 
         if self.titlecard.exit_flag == False:
             self.alpha += math.radians(1)
@@ -67,10 +68,24 @@ class Title_Screen(State):
             self.font.render(self.screen, txt, (50, 50, 50), ((2 + WIDTH-self.font.calc_surf_width(txt))/2, 2 + 30 + HEIGHT/2 - self.font.space_height/2), alpha=155 * math.sin(self.alpha) + 100)
             self.font.render(self.screen, txt, (200, 200, 200), ((WIDTH-self.font.calc_surf_width(txt))/2, 30 + HEIGHT/2 - self.font.space_height/2), alpha=155 * math.sin(self.alpha) + 100)
 
+        if self.start:
+            if self.black_alpha > 0:
+                self.black_alpha -= 5
+                self.black.set_alpha(min(255, self.black_alpha))
+                self.screen.blit(self.black, (0, 0))
+                return
+            else:
+                self.black_alpha = 0
+                self.start = False
+
         if self.spaceship.stage == 0:
             if pygame.key.get_pressed()[pygame.K_SPACE]:
                 self.titlecard.exit_flag = True
                 self.spaceship.stage = 1
+                self.settings_button.direction = self.settings_button.clicked = False
+                self.sound_button.direction = self.sound_button.clicked = False
+                self.music_button.direction = self.music_button.clicked = False
+
         if self.titlecard.exit_flag:
             self.titlecard.exit()
             self.spaceship.mouse_control = False
@@ -82,15 +97,17 @@ class Title_Screen(State):
             self.game.music_player.set_vol((400 - ((180/math.pi) * Star_3D.angle)) / 400, channel="bg")
 
             Star_3D.update_angle()
-        self.titlecard.update()
 
-        if (180/math.pi) * Star_3D.angle > 800:
+        if (180/math.pi) * Star_3D.angle > 900:
             self.black_alpha += 5
             self.black.set_alpha(self.black_alpha)
             self.screen.blit(self.black, (0, 0))
             self.game.music_player.stop("bg")
 
-        if (180/math.pi) * Star_3D.angle > 1100:
-            self.game.state_loader.add_state(self.game.state_loader.states["cutscene_1"])
-            self.stars.empty()
-            Star_3D.angle = 0
+        self.game.debugger.add_text(str(self.game.music_player.is_playing("sfx")))
+
+        if (180/math.pi) * Star_3D.angle > 1200:
+            # if not self.game.music_player.is_playing("sfx"):
+                self.game.state_loader.add_state(self.game.state_loader.states["cutscene_1"])
+                self.stars.empty()
+                Star_3D.angle = 0
