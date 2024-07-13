@@ -13,6 +13,7 @@ import asyncio
 
 from scripts.entities.player import Player
 from scripts.entities.spaceship import Spaceship, Spaceship_Side, Spaceship_Fidget_Spinner
+from scripts.entities.liztard import Liztard
 from scripts.gui.custom_fonts import Custom_Font
 from scripts.gui.dialogue_box import Press_Spacebar
 from scripts.music.music_player import Music_Player
@@ -90,6 +91,7 @@ class Game:
         Star_3D.cache_sprites()
         Background_Star.cache_sprites()
         Pedestal.cache_sprites()
+        Liztard.cache_sprites()
 
     def initialise(self):
         pygame.init()  #general pygame

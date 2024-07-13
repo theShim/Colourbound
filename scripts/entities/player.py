@@ -153,6 +153,19 @@ class Player(pygame.sprite.Sprite):
             
         ###################################################################################### 
 
+    def collisions(self):
+        map_: pygame.Surface = self.game.state_loader.current_state.tilemap.map
+        if self.rect.x < 0:
+            self.rect.x = 0
+        elif self.rect.right > map_.get_width():
+            self.rect.right = map_.get_width()
+        if self.rect.y < 0:
+            self.rect.y = 0
+        elif self.rect.bottom > map_.get_height():
+            self.rect.bottom = map_.get_height()
+            
+        ###################################################################################### 
+
     #changes the direction depending on the angle its facing to the mouse cursor
     def change_direction(self):
         mousePos = vec(pygame.mouse.get_pos())
@@ -205,6 +218,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         keys = pygame.key.get_pressed()
         self.move(keys)
+        self.collisions()
         self.shoot()
 
         self.animate()

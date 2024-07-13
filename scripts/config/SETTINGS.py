@@ -13,7 +13,8 @@ TILE_SIZE = 32
 Z_LAYERS = {
     "background particle" : 3,
     "pedestal" : 4,
-    "player" : 5,
+    "enemy" : 5,
+    "player" : 6,
     "projectile" : 7,
     "foreground particle" : 8,
     "gui" : 10

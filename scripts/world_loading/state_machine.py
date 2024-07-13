@@ -115,7 +115,7 @@ class State:
 
         if self.end == False:
             from scripts.world_loading.states.cutscenes import Ending
-            if self.colour_meter.percent >= 97:
+            if self.colour_meter.percent >= 98.5:
                 self.end = True
                 self.game.state_loader.add_state(Ending(self.game, self))
 

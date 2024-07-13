@@ -13,7 +13,7 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 
 from scripts.objects.pedestal import Pedestal
 
-from scripts.utils.CORE_FUNCS import vec, crop
+from scripts.utils.CORE_FUNCS import vec, crop, lerp
 from scripts.config.SETTINGS import TILE_SIZE, WIDTH, HEIGHT
 
     ##############################################################################################
@@ -27,6 +27,7 @@ class Tilemap:
         self.map = None
         self.grey_map = None
 
+        self.true_filled = 0
         self.filled = 0
         self.to_fill = -math.inf
         self.changed = False #if the grey map has been affected, only calculte how much left if something has happened
@@ -195,8 +196,13 @@ class Tilemap:
         if self.changed:
             arr = pygame.surfarray.array3d(self.grey_map)
             clear = np.logical_and.reduce(arr == 0, axis=-1)
-            self.filled = np.count_nonzero(clear)
+            self.true_filled = np.count_nonzero(clear)
             self.changed = False
+
+        if self.filled != self.true_filled:
+            self.filled = lerp(self.true_filled, self.filled, 0.1)
+            if abs(self.filled - self.true_filled) < 0.5:
+                self.filled = self.true_filled
 
     ##############################################################################################
 

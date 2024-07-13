@@ -72,13 +72,15 @@ class Paint_Splat(pygame.sprite.Sprite):
                 cls.SPRITES.append(pygame.transform.flip(s, False, True))
                 cls.SPRITES.append(pygame.transform.flip(s, True, True))
 
-    def __init__(self, game, groups, pos):
+    def __init__(self, game, groups, pos, scale=1):
         super().__init__(groups)
         self.game = game
         self.screen = self.game.screen
         self.z = Z_LAYERS["background particle"]
 
         self.image: pygame.Surface = random.choice(self.SPRITES).copy()
+        if scale >= 1:
+            self.image = pygame.transform.scale(self.image, vec(self.image.get_size()) * scale)
         self.image.set_colorkey((0, 0, 0))
 
         self.pos = pos
